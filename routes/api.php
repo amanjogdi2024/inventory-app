@@ -35,6 +35,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/edit-profile', [AuthController::class, 'updateProfile']);
 
     Route::get('/packing-list/{pac_id}', [FabricController::class, 'packingList']);
+    Route::get('/material-request-list', [FabricController::class, 'materialList']);
+    Route::get('/get-material/{fab_id}/{ord_id}', [FabricController::class, 'materialByfabord']); 
+    
+    Route::get('/material-request/{rq_id}', [FabricController::class, 'materialRequest']); 
 });
 
 Route::middleware('geo_location')->get('/geoposition', [EmployeeController::class, 'geoposition']);

@@ -110,7 +110,7 @@ class FabricController extends Controller
     public function packingList($pac_id)
     {
         $query = "SELECT tbl_packing_list.*, cat.cat_name_en, fabric.fabric_color, fabric.fabric_box, fabric.fabric_no, fabric.fabric_in_piece, fabric.fabric_in_price, fabric.fabric_in_total, fabric.fabric_balance, fabric.on_producing FROM tbl_packing_list LEFT JOIN fabric ON tbl_packing_list.fabric_id = fabric.fabric_id LEFT JOIN cat ON cat.cat_id = fabric.cat_id WHERE pac_id = ?";
-        $packingList['packing'] = DB::select("SELECT tbl_packing.*,CONCAT('PAC-',RIGHT(CONCAT('00000',tbl_packing.pac_id),6)) AS pack_no,supplier.supplier_name FROM tbl_packing LEFT JOIN supplier ON tbl_packing.supplier_id = supplier.supplier_id WHERE tbl_packing.pac_id='".$pac_id."' ");
+        
 
         $packingList['packlist'] = DB::select($query, [$pac_id]);
 
@@ -123,6 +123,49 @@ class FabricController extends Controller
         
 
         return response()->json($packingList);
+    }
+
+    public function materialList()
+    {              
+
+        $query = DB::select("SELECT 
+                tbl_rq_form.*, 
+                employee.employee_name 
+            FROM 
+                tbl_rq_form 
+            LEFT JOIN 
+                tbl_rq_form_item ON tbl_rq_form.rq_id = tbl_rq_form_item.rq_id 
+            LEFT JOIN 
+                employee ON employee.employee_id = tbl_rq_form.employee_id 
+            WHERE 
+                tbl_rq_form.enable = 1 
+                AND (tbl_rq_form.rq_status = 'new' OR tbl_rq_form.rq_status = 'update')  
+            ORDER BY 
+                tbl_rq_form.finish_date DESC, tbl_rq_form.rq_date DESC;
+            ");
+
+        return response()->json($query);
+    }
+
+    public function materialByfabord($fab_id, $ord_id)
+    {                      
+        $order_main = OrderMain::where('order_main_id', $ord_id)->first();
+                
+        $order_title = $order_main['order_main_code'];
+
+        $data['tbl_order_lkr'] = DB::select("SELECT * FROM tbl_order_lkr WHERE order_title='".$order_title."' AND enable=1 ORDER BY file_name ASC ");
+        
+        $data['order'] = DB::select("SELECT order_name,order_detail,folder_name FROM tbl_order_lkr_title WHERE order_title='".$order_title."' ");
+
+
+        return response()->json($data);
+    }
+
+    public function materialRequest($rq_id){
+        
+        $materialRequest = DB::select("SELECT tbl_rq_form_item.*,fabric.*,cat.cat_name_en FROM tbl_rq_form_item LEFT JOIN fabric ON tbl_rq_form_item.fabric_id=fabric.fabric_id LEFT JOIN cat ON cat.cat_id=fabric.cat_id WHERE tbl_rq_form_item.rq_id='".$rq_id."' ");
+
+        return response()->json($materialRequest);
     }
 
 }
