@@ -36,9 +36,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/packing-list/{pac_id}', [FabricController::class, 'packingList']);
     Route::get('/material-request-list', [FabricController::class, 'materialList']);
-    Route::get('/get-material/{fab_id}/{ord_id}', [FabricController::class, 'materialByfabord']); 
+    Route::get('/get-material/{fab_id}/{ord_id}', [FabricController::class, 'materialByfabord']);
+
+    Route::get('/adjust-list', [FabricController::class, 'adjust']);
     
     Route::get('/material-request/{rq_id}', [FabricController::class, 'materialRequest']); 
+
+    Route::get('/saveRQEditing/{rq_id}/{fabric_id_list}', [FabricController::class, 'updateFabricStatus']); 
+
+    Route::post('/finish-request', [FabricController::class, 'finishRq']);
+
+    Route::post('/add-request', [FabricController::class, 'addRq']);
+
+    Route::post('/order-title', [FabricController::class, 'orderTitle']);
+    
+
+    
 });
 
 Route::middleware('geo_location')->get('/geoposition', [EmployeeController::class, 'geoposition']);
